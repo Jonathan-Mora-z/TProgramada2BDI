@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tabla</title>
+</head>
+
+<body>
+
+    <div style="width:500px; margin:100px auto; border:1px solid black; padding:40px; text-align:center;">
+        
+        <h1>Insertar Empleado</h1>
+
+        <form action="/procesar" method="POST">
+            <input type="text" name="nombre" placeholder="Tu nombre" required><br><br>
+            <input name="salario" placeholder="Tu salario" required><br><br>
+            <div style="margin:20px 0;">
+                <p style="color:red">{{mensaje}}</p>
+            </div>
+            <button type="submit">Enviar</button>
+        </form>
+
+    </div>
+
+</body>
+</html>

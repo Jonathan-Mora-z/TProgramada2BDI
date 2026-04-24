@@ -45,8 +45,10 @@ def inicio():
     cursor=BD.cursor()
     cursor.execute("EXEC dbo.consultarEmpleados")
     empleados = cursor.fetchall()
+    cursor.execute("EXEC dbo.consultarPuestos")
+    puestos = cursor.fetchall()
     BD.close()
-    return render_template("browserTareaBD.html",empleados=empleados)
+    return render_template("browserTareaBD.html",empleados=empleados,puestos=puestos)
 
 # Página del formulario
 @app.route("/insertar")

@@ -14,6 +14,68 @@
         tr:nth-child(even) {
             background-color: #cbcbcb;
         }
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+
+            background: rgba(0,0,0,0.6);
+
+            justify-content: center; /* horizontal */
+            align-items: center;     /* vertical */
+        }
+
+        /* Caja del modal */
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 320px;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        /* Inputs */
+        .modal-content input,
+        .modal-content select {
+            width: 90%;
+            padding: 8px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        /* Botones */
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        /* Botón guardar */
+        .btn-guardar {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-guardar:hover {
+            background-color: #218838;
+        }
+
+        /* Botón cancelar */
+        .btn-cancelar {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-cancelar:hover {
+            background-color: #c82333;
+        }
     </style>
     </head>
     <body>
@@ -81,12 +143,12 @@
             cursor: pointer;" onclick="window.location.href='/eliminar';">
                 Eliminar
         </button>
-        <button id="btnActualizar" disabled style="margin-left: 535px;
+        <button onclick = "openModal()" id="btnActualizar" disabled style="margin-left: 535px;
             display: block;
             margin: 20px auto 0;
             padding: 10px 20px;
             border: '1';
-            cursor: pointer;" onclick="window.location.href='/actualizar';">
+            cursor: pointer;">
                 Actualizar
         </button>
         <button id="btnListarM" disabled style="margin-left: 535px;
@@ -97,6 +159,30 @@
             cursor: pointer;" onclick="window.location.href='/listarM';">
                 Listar Movimientos
         </button>
+        <div id="modal">
+            <div class="modal-content">
+
+            <h3>Nuevo Empleado</h3>
+
+            <form method="POST" action="/insertar">
+                    <input type="text" name="nombre" placeholder="Nombre" required>
+                    <input type="text" name="documento" placeholder="Documento" required>
+
+                    <select name="puesto" required>
+                        <option value="">Seleccione puesto</option>
+                        {% for puesto in puestos %}
+                            <option value="{{puesto[0]}}">{{puesto[1]}}</option>
+                        {% endfor %}
+                    </select>
+
+                    <br>
+
+                    <button type="submit" class="btn btn-guardar">Guardar</button>
+                    <button type="button" class="btn btn-cancelar" onclick="closeModal()">Cancelar</button>
+                </form>
+
+            </div>
+        </div>
         <script>
             const radios = document.querySelectorAll("input[name='empleado']");
             const botones = [
@@ -116,6 +202,12 @@
             const id = seleccionado.value;
             // Enviar el id en la URL
             window.location.href = ruta + "?id=" + id;
+            }
+            function openModal() {
+                document.getElementById("modal").style.display = "flex";
+            }
+            function closeModal() {
+                document.getElementById("modal").style.display = "none";
             }
         </script>
     </body>

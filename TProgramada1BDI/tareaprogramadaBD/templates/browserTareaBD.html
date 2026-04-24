@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Tabla
+        </title>
+        <style>
+
+        td, th {
+            border: 1px solid black;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #cbcbcb;
+        }
+    </style>
+    </head>
+    <body>
+        
+        <h1 align="center" style="margin-top: 50px;">
+            Lista de empleados
+        </h1>
+
+        <div border="1" style="width:650px; border:2px solid black; margin-top:50px; margin-left: 450px; max-height: 400px; overflow-y: auto;">
+            <table border="1" width="100%">
+                <tr align="left">
+                    <th>
+                        Nombre
+                    </th>
+                    <th>
+                        Documento de identidad
+                    </th>
+                    <th>
+                        Saldo Vacaciones
+                    </th>
+                    <th>
+                        Seleccionar
+                    </th>
+                </tr>
+                {% for empleado in empleados %}
+                <tr align="left">
+                    <td>
+                        {{ empleado[3] }}
+                    </td>
+                    <td>
+                        {{ empleado[2] }}
+                    </td>
+                    <td>
+                        {{ empleado[5] }}
+                    </td>
+                    <td>
+                        <input type="radio" name="empleado" value="{{ empleado[0] }}">
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            <button style="margin-left: 550px;
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 20px;
+            border: '1';
+            cursor: pointer;" onclick="window.location.href='/insertar';">
+                Insertar
+            </button>
+        </div>
+        <button id="btnConsultar" disabled style="margin-left: 535px;
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 20px;
+            border: '1';
+            cursor: pointer;" onclick="window.location.href='/consultar';">
+                Consultar
+        </button>
+        <button id="btnEliminar" disabled style="margin-left: 535px;
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 20px;
+            border: '1';
+            cursor: pointer;" onclick="window.location.href='/eliminar';">
+                Eliminar
+        </button>
+        <button id="btnActualizar" disabled style="margin-left: 535px;
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 20px;
+            border: '1';
+            cursor: pointer;" onclick="window.location.href='/actualizar';">
+                Actualizar
+        </button>
+        <button id="btnListarM" disabled style="margin-left: 535px;
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 20px;
+            border: '1';
+            cursor: pointer;" onclick="window.location.href='/listarM';">
+                Listar Movimientos
+        </button>
+        <script>
+            const radios = document.querySelectorAll("input[name='empleado']");
+            const botones = [
+                document.getElementById("btnConsultar"),
+                document.getElementById("btnEliminar"),
+                document.getElementById("btnActualizar"),
+                document.getElementById("btnListarM")
+            ];
+            radios.forEach(radio => {
+            radio.addEventListener("change", () => {
+                botones.forEach(btn => btn.disabled = false);
+                });
+            });
+            function redirigir(ruta) {
+            const seleccionado = document.querySelector("input[name='empleado']:checked");
+            if (!seleccionado) return;
+            const id = seleccionado.value;
+            // Enviar el id en la URL
+            window.location.href = ruta + "?id=" + id;
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tabla</title>
+</head>
+
+<body>
+
+    <div style="width:500px; margin:100px auto; border:1px solid black; padding:40px; text-align:center;">
+        
+        <h1>Insertar Empleado</h1>
+
+        <form action="/procesar" method="POST">
+            <input type="text" name="nombre" placeholder="Nombre y apellidos" required><br><br>
+            <input name="docIden" placeholder="Documento de identidad" required><br><br>
+            <label for="puesto">Seleccione un puesto:</label>
+            <select id="puesto" name="puesto">
+                <option value="">==Seleccione==</option>
+                {% for puesto in puestos %}
+                <option value="{{puesto[0]}}">{{puesto[1]}}</option>
+                {% endfor %}
+            </select>
+            <div style="margin:20px 0;">
+                <p style="color:red">{{mensaje}}</p>
+            </div>
+            <button type="submit">Registrar</button>
+        </form>
+
+    </div>
+
+</body>
+</html>

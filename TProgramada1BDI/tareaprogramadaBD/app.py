@@ -60,6 +60,27 @@ def insertar():
     BD.close()
     return render_template("formulario.html",puestos=puestos)
 
+@app.route("/eliminar", methods=["POST"])
+def eliminar():
+    id = request.form["empleado"]
+    BD=conectarBD()
+    cursor=BD.cursor()
+    cursor.execute("EXEC dbo.borrarEmpleado @Id=?", (id,))
+    BD.commit()
+    BD.close()
+    return redirect("/principal")
+@app.route("/actualizar", methods=["POST"])
+def actualizar():
+    id = request.form["empleado"]
+    nombre=request.form["nombre"]
+    docIden=request.form["documento"]
+    puesto=request.form["puesto"]
+    BD=conectarBD()
+    cursor=BD.cursor()
+    cursor.execute("""EXEC dbo.ActualizarEmpleado @Id=?, @IdPuesto=?,@ValorDocIden=?,@Nombre=?""", (id,puesto,docIden,nombre))
+    BD.commit()
+    BD.close()
+    return redirect("/principal")
 # Procesar datos
 @app.route("/procesar", methods=["POST"])
 def procesar():

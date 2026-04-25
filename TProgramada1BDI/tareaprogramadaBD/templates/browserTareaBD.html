@@ -14,7 +14,7 @@
         tr:nth-child(even) {
             background-color: #cbcbcb;
         }
-        #modal {
+        #modal, #alertaBorrar, #modalConsulta {
             display: none;
             position: fixed;
             top: 0;
@@ -85,39 +85,69 @@
         </h1>
 
         <div border="1" style="width:650px; border:2px solid black; margin-top:50px; margin-left: 450px; max-height: 400px; overflow-y: auto;">
-            <table border="1" width="100%">
-                <tr align="left">
-                    <th>
-                        Nombre
-                    </th>
-                    <th>
-                        Documento de identidad
-                    </th>
-                    <th>
-                        Saldo Vacaciones
-                    </th>
-                    <th>
-                        Seleccionar
-                    </th>
-                </tr>
-                {% for empleado in empleados %}
-                <tr align="left">
-                    <td>
-                        {{ empleado[3] }}
-                    </td>
-                    <td>
-                        {{ empleado[2] }}
-                    </td>
-                    <td>
-                        {{ empleado[5] }}
-                    </td>
-                    <td>
-                        <input type="radio" name="empleado" value="{{ empleado[0] }}">
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
+            <form method="POST" id="formAcciones">
+                <table border="1" width="100%">
+                    <tr align="left">
+                        <th>
+                            Nombre
+                        </th>
+                        <th>
+                            Documento de identidad
+                        </th>
+                        <th>
+                            Saldo Vacaciones
+                        </th>
+                        <th>
+                            Seleccionar
+                        </th>
+                    </tr>
+                    {% for empleado in empleados %}
+                    <tr align="left">
+                        <td>
+                            {{ empleado[2] }}
+                        </td>
+                        <td>
+                            {{ empleado[1] }}
+                        </td>
+                        <td>
+                            {{ empleado[4] }}
+                        </td>
+                        <td>
+                            <input 
+                                    type="radio" 
+                                    name="empleado" 
+                                    value="{{ empleado[0] }}"
+                                    data-nombre="{{ empleado[2] }}"
+                                    data-documento="{{ empleado[1] }}"
+                                    data-saldo="{{ empleado[4] }}"
+                                    data-puesto="{{empleado[6]}}"
+                                >
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <div id="modal">
+                    <div class="modal-content">
 
+                    <h3>Actualizar Empleado</h3>
+
+                            <p>Datos actuales del empleado:</p>
+                            <p id="info"></p>
+                            <input type="text" name="nombre" placeholder="Nombre" required>
+                            <input type="text" name="documento" placeholder="Documento" required>
+
+                            <select name="puesto" required>
+                                <option value="">Seleccione puesto</option>
+                                {% for puesto in puestos %}
+                                    <option value="{{puesto[0]}}">{{puesto[1]}}</option>
+                                {% endfor %}
+                            </select>
+
+                            <button type="submit" class="btn btn-guardar" onclick="enviarid('/actualizar')">Confirmar</button>
+                            <button type="button" class="btn btn-cancelar" onclick="closeModal()">Cancelar</button>
+                    </div>
+                </div>
+            </form>
             <button style="margin-left: 550px;
             display: block;
             margin: 20px auto 0;
@@ -126,21 +156,24 @@
             cursor: pointer;" onclick="window.location.href='/insertar';">
                 Insertar
             </button>
+            <div style="margin:20px 0;">
+                <p style="color:rgb(0, 0, 0)">{{mensaje}}</p>
+            </div>
         </div>
         <button id="btnConsultar" disabled style="margin-left: 535px;
             display: block;
             margin: 20px auto 0;
             padding: 10px 20px;
             border: '1';
-            cursor: pointer;" onclick="window.location.href='/consultar';">
+            cursor: pointer;" onclick="openModalC()">
                 Consultar
         </button>
-        <button id="btnEliminar" disabled style="margin-left: 535px;
+        <button onclick ="openModalB()"id="btnEliminar" disabled style="margin-left: 535px;
             display: block;
             margin: 20px auto 0;
             padding: 10px 20px;
             border: '1';
-            cursor: pointer;" onclick="window.location.href='/eliminar';">
+            cursor: pointer;">
                 Eliminar
         </button>
         <button onclick = "openModal()" id="btnActualizar" disabled style="margin-left: 535px;
@@ -159,27 +192,32 @@
             cursor: pointer;" onclick="window.location.href='/listarM';">
                 Listar Movimientos
         </button>
-        <div id="modal">
+        <div id="alertaBorrar">
             <div class="modal-content">
 
-            <h3>Nuevo Empleado</h3>
+                <h3>Confirmar Eliminación</h3>
+                <p id="infoEmpleado"></p>
+                <p>¿Está seguro de que desea eliminar este empleado?</p>
 
-            <form method="POST" action="/insertar">
-                    <input type="text" name="nombre" placeholder="Nombre" required>
-                    <input type="text" name="documento" placeholder="Documento" required>
+                <button type="button" class="btn btn-eliminar" onclick="enviarid('/eliminar')">
+                    Eliminar
+                </button>
 
-                    <select name="puesto" required>
-                        <option value="">Seleccione puesto</option>
-                        {% for puesto in puestos %}
-                            <option value="{{puesto[0]}}">{{puesto[1]}}</option>
-                        {% endfor %}
-                    </select>
+                <button type="button" class="btn btn-cancelar" onclick="closeModalB()">
+                    Cancelar
+                </button>
 
-                    <br>
+            </div>
+        </div>
+        <div id="modalConsulta">
+            <div class="modal-content">
 
-                    <button type="submit" class="btn btn-guardar">Guardar</button>
-                    <button type="button" class="btn btn-cancelar" onclick="closeModal()">Cancelar</button>
-                </form>
+                <h3>Datos del empleado</h3>
+                <p id="infoEmpleadoC"></p>
+
+                <button type="button" class="btn btn-cancelar" onclick="closeModalC()">
+                   Cerrar
+                </button>
 
             </div>
         </div>
@@ -204,11 +242,91 @@
             window.location.href = ruta + "?id=" + id;
             }
             function openModal() {
+                const seleccionado = document.querySelector("input[name='empleado']:checked");
+                if (!seleccionado) {
+                    alert("Seleccione un empleado");
+                    return;
+                }
+
+                // Obtener datos
+                const nombre = seleccionado.dataset.nombre;
+                const documento = seleccionado.dataset.documento;
+
+                // Insertar en el modal
+                document.getElementById("info").innerHTML = `
+                    <strong>Nombre:</strong> ${nombre} <br>
+                    <strong>Documento:</strong> ${documento} <br>
+                `;
+
+                // Mostrar modal
                 document.getElementById("modal").style.display = "flex";
             }
             function closeModal() {
                 document.getElementById("modal").style.display = "none";
             }
+            function openModalB() {
+                const seleccionado = document.querySelector("input[name='empleado']:checked");
+                if (!seleccionado) {
+                    alert("Seleccione un empleado");
+                    return;
+                }
+
+                // Obtener datos
+                const nombre = seleccionado.dataset.nombre;
+                const documento = seleccionado.dataset.documento;
+                const saldo = seleccionado.dataset.saldo;
+
+                // Insertar en el modal
+                document.getElementById("infoEmpleado").innerHTML = `
+                    <strong>Documento:</strong> ${documento} <br>
+                    <strong>Nombre:</strong> ${nombre} <br>
+                    <strong>Saldo:</strong> ${saldo}
+                `;
+
+                // Mostrar modal
+                document.getElementById("alertaBorrar").style.display = "flex";
+            }
+            function closeModalB() {
+                document.getElementById("alertaBorrar").style.display = "none";
+            }
+            function openModalC() {
+                const seleccionado = document.querySelector("input[name='empleado']:checked");
+                if (!seleccionado) {
+                    alert("Seleccione un empleado");
+                    return;
+                }
+
+                // Obtener datos
+                const nombre = seleccionado.dataset.nombre;
+                const documento = seleccionado.dataset.documento;
+                const saldo = seleccionado.dataset.saldo;
+                const puesto = seleccionado.dataset.puesto;
+
+                // Insertar en el modal
+                document.getElementById("infoEmpleadoC").innerHTML = `
+                    <strong>Documento:</strong> ${documento} <br>
+                    <strong>Nombre:</strong> ${nombre} <br>
+                    <strong>Saldo:</strong> ${saldo}<br>
+                    <strong>Puesto:</strong> ${puesto}
+                `;
+
+                // Mostrar modal
+                document.getElementById("modalConsulta").style.display = "flex";
+            }
+            function closeModalC() {
+                document.getElementById("modalConsulta").style.display = "none";
+            }
+            function enviarid(ruta) {
+            const seleccionado = document.querySelector("input[name='empleado']:checked");
+            if (!seleccionado) {
+                alert("Seleccione un empleado");
+                return;
+            }
+
+            const form = document.getElementById("formAcciones");
+            form.action = ruta;
+            form.submit();
+        }
         </script>
     </body>
 </html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movimientos</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+        }
+
+        .info {
+            border: 2px solid black;
+            padding: 10px;
+            width: 400px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Movimientos</h1>
+
+<!-- 🔹 Info del empleado -->
+<div class="info">
+    <strong>Cédula:</strong> {{ empleado[0] }} <br>
+    <strong>Nombre:</strong> {{ empleado[1] }} <br>
+    <strong>Saldo:</strong> {{ empleado[2] }}
+</div>
+
+<!-- 🔹 Tabla de movimientos -->
+<table>
+    <tr>
+        <th>Fecha</th>
+        <th>Tipo Movimiento</th>
+        <th>Monto</th>
+        <th>Nuevo Saldo</th>
+        <th>Usuario</th>
+        <th>IP</th>
+        <th>Time</th>
+    </tr>
+
+    {% for m in movimientos %}
+    <tr>
+        <td>{{ m[0] }}</td>
+        <td>{{ m[1] }}</td>
+        <td>{{ m[2] }}</td>
+        <td>{{ m[3] }}</td>
+        <td>{{ m[4] }}</td>
+        <td>{{ m[5] }}</td>
+        <td>{{ m[6] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- 🔹 Botón -->
+<a href="/insertarMovimiento/{{ idEmpleado }}">
+    <button class="btn">Insertar Movimiento</button>
+</a>
+
+</body>
+</html>

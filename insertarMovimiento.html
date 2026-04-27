@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Insertar Movimiento</title>
+</head>
+<body>
+
+<h2>Insertar Movimiento</h2>
+
+<form method="POST" action="/guardarMovimiento">
+
+    <input type="hidden" name="IdEmpleado" value="{{ idEmpleado }}">
+
+    <label>Tipo de Movimiento:</label>
+    <select name="IdTipoMovimiento" required>
+        {% for t in tipos %}
+            <option value="{{ t[0] }}">{{ t[1] }}</option>
+        {% endfor %}
+    </select>
+
+    <br><br>
+
+    <label>Monto:</label>
+    <input type="number" name="Monto" required>
+
+    <br><br>
+
+    <button type="submit">Guardar</button>
+
+</form>
+
+</body>
+</html>

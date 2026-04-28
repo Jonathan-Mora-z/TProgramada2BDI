@@ -109,6 +109,69 @@ def procesar():
         BD.commit()
         BD.close()
         return redirect("/principal")
+@app.route("/movimientos",methods =["GET","POST"])
+def movimientos():
+    if request.method == "POST":
+        id = request.form["empleado"]
+    else:
+        id = request.args.get("id")
+    BD = conectarBD()
+    cursor = BD.cursor()
+
+    cursor.execute("EXEC listarMovimientos ?", (id,))
+
+    empleado = cursor.fetchone()
+
+    cursor.nextset()
+    movimientos = cursor.fetchall()
+
+    BD.close()
+
+    return render_template(
+        "movimientos.html",
+        empleado=empleado,
+        movimientos=movimientos,
+        idEmpleado=id
+    )
+
+@app.route("/insertarMovimiento/<int:id>")
+def insertar_movimiento(id):
+    BD = conectarBD()
+    cursor = BD.cursor()
+
+    # Obtener tipos de movimiento (para dropdown)
+    cursor.execute("SELECT Id, Nombre FROM TipoMovimiento")
+    tipos = cursor.fetchall()
+
+    BD.close()
+
+    return render_template("insertarMovimiento.html",
+                           idEmpleado=id,
+                           tipos=tipos)
+
+@app.route("/guardarMovimiento", methods=["POST"])
+def guardar_movimiento():
+    IdEmpleado = request.form["IdEmpleado"]
+    IdTipoMovimiento = request.form["IdTipoMovimiento"]
+    Monto = request.form["Monto"]
+
+    # ⚠️ por ahora valores fijos (luego login)
+    IdUsuario = 1
+    IP = 123456  # si usas INT
+
+    BD = conectarBD()
+    cursor = BD.cursor()
+
+    cursor.execute(
+        "EXEC insertarMovimiento ?, ?, ?, ?, ?",
+        (IdEmpleado, IdTipoMovimiento, Monto, IdUsuario, IP)
+    )
+
+    BD.commit()
+    BD.close()
+
+    # volver a ver movimientos del mismo empleado
+    return redirect(f"/movimientos?id={IdEmpleado}")
 
 if __name__ == "__main__":
     app.run(debug=True)

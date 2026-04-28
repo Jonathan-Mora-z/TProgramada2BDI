@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movimientos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .info p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        .info strong {
+            color: #555;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #218838;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Movimientos del Empleado</h1>
+
+    <!-- 🔹 Info del empleado -->
+    <div class="card info">
+        <p><strong>Cédula:</strong> {{ empleado[0] }}</p>
+        <p><strong>Nombre:</strong> {{ empleado[1] }}</p>
+        <p><strong>Saldo:</strong> ₡ {{ empleado[2] }}</p>
+    </div>
+
+    <!-- 🔹 Tabla -->
+    <div class="card">
+        <table>
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Monto</th>
+                <th>Saldo Nuevo</th>
+                <th>Usuario</th>
+                <th>IP</th>
+                <th>Hora</th>
+            </tr>
+
+            {% for m in movimientos %}
+            <tr>
+                <td>{{ m[0] }}</td>
+                <td>{{ m[1] }}</td>
+                <td>₡ {{ m[2] }}</td>
+                <td>₡ {{ m[3] }}</td>
+                <td>{{ m[4] }}</td>
+                <td>{{ m[5] }}</td>
+                <td>{{ m[6] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- 🔹 Botones -->
+    <div class="buttons">
+        <a href="/insertarMovimiento/{{ idEmpleado }}">
+            <button class="btn btn-primary">➕ Insertar Movimiento</button>
+        </a>
+
+        <a href="/principal">
+            <button class="btn btn-secondary">⬅ Volver</button>
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>

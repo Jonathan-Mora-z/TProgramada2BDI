@@ -5,16 +5,163 @@
             Tabla
         </title>
         <style>
+            body {
+                font-family: 'Segoe UI', Arial;
+                background-color: #f4f6f9;
+                margin: 0;
+                padding: 30px;
+            }
 
-        td, th {
-            border: 1px solid black;
-            padding: 8px;
-        }
+            h1 {
+                text-align: center;
+                color: #333;
+            }
 
-        tr:nth-child(even) {
-            background-color: #cbcbcb;
-        }
-    </style>
+            /* Contenedor principal */
+            .contenedor {
+                width: 750px;
+                margin: 50px auto;
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+                padding: 20px;
+                max-height: 450px;
+                overflow-y: auto;
+            }
+
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            th {
+                background-color: #007bff;
+                color: white;
+                padding: 10px;
+                text-align: left;
+            }
+
+            td {
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+
+            tr:hover {
+                background-color: #e9f2ff;
+            }
+
+            /* Botones generales */
+            button {
+                display: block;
+                margin: 15px auto;
+                padding: 10px 20px;
+                border-radius: 8px;
+                border: none;
+                cursor: pointer;
+                font-size: 14px;
+                transition: 0.2s;
+            }
+
+            button:disabled {
+                background-color: #ccc;
+                cursor: not-allowed;
+            }
+
+            #btnConsultar { background-color: #17a2b8; color: white; }
+            #btnEliminar { background-color: #dc3545; color: white; }
+            #btnActualizar { background-color: #ffc107; color: black; }
+            #btnListarM { background-color: #28a745; color: white; }
+
+            #btnConsultar:hover { background-color: #138496; }
+            #btnEliminar:hover { background-color: #c82333; }
+            #btnActualizar:hover { background-color: #e0a800; }
+            #btnListarM:hover { background-color: #218838; }
+
+            /* Insertar */
+            .btn-insertar {
+                background-color: #007bff;
+                color: white;
+            }
+
+            .btn-insertar:hover {
+                background-color: #0069d9;
+            }
+
+            /* Modal fondo */
+            #modal, #alertaBorrar, #modalConsulta {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.6);
+                justify-content: center;
+                align-items: center;
+            }
+
+            /* Caja modal */
+            .modal-content {
+                background: white;
+                padding: 25px;
+                border-radius: 12px;
+                width: 320px;
+                box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+                text-align: center;
+            }
+
+            .modal-content input,
+            .modal-content select {
+                width: 90%;
+                padding: 8px;
+                margin: 8px 0;
+                border-radius: 6px;
+                border: 1px solid #ccc;
+            }
+
+            .btn {
+                padding: 8px 15px;
+                border-radius: 6px;
+                cursor: pointer;
+                margin: 5px;
+                border: none;
+            }
+
+            .btn-guardar {
+                background-color: #28a745;
+                color: white;
+            }
+
+            .btn-guardar:hover {
+                background-color: #218838;
+            }
+
+            .btn-cancelar {
+                background-color: #dc3545;
+                color: white;
+            }
+
+            .btn-cancelar:hover {
+                background-color: #c82333;
+            }
+
+            .btn-eliminar {
+                background-color: #dc3545;
+                color: white;
+            }
+
+            .btn-eliminar:hover {
+                background-color: #c82333;
+            }
+
+            p {
+                font-size: 14px;
+            }
+        </style>
     </head>
     <body>
         
@@ -22,65 +169,104 @@
             Lista de empleados
         </h1>
 
-        <div border="1" style="width:650px; border:2px solid black; margin-top:50px; margin-left: 450px; max-height: 400px; overflow-y: auto;">
-            <table border="1" width="100%">
-                <tr align="left">
-                    <th>
-                        Nombre
-                    </th>
-                    <th>
-                        Salario
-                    </th>
-                    <th>
-                        Seleccionar
-                    </th>
-                </tr>
-                {% for empleado in empleados %}
-                <tr align="left">
-                    <td>
-                        {{ empleado[1] }}
-                    </td>
-                    <td>
-                        {{ empleado[2] }}
-                    </td>
-                    <td>
-                        <input type="radio" name="empleado" value="{{ empleado[0] }}">
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
+        <div class="contenedor">
+            <form method="POST" action="/filtrar" style="margin-bottom:15px;">
+                    <h3 style="display:inline;">Filtrar:</h3>
+                    <input type="text" name="filtro" placeholder="Ingrese nombre o documento">
+                    <button type="submit">Buscar</button>
+            </form>
+            <form method="POST" id="formAcciones">
+                <table border="1" width="100%">
+                    <tr align="left">
+                        <th>
+                            Nombre
+                        </th>
+                        <th>
+                            Documento de identidad
+                        </th>
+                        <th>
+                            Saldo Vacaciones
+                        </th>
+                        <th>
+                            Seleccionar
+                        </th>
+                    </tr>
+                    {% for empleado in empleados %}
+                    <tr align="left">
+                        <td>
+                            {{ empleado[2] }}
+                        </td>
+                        <td>
+                            {{ empleado[1] }}
+                        </td>
+                        <td>
+                            {{ empleado[4] }}
+                        </td>
+                        <td>
+                            <input 
+                                    type="radio" 
+                                    name="empleado" 
+                                    value="{{ empleado[0] }}"
+                                    data-nombre="{{ empleado[2] }}"
+                                    data-documento="{{ empleado[1] }}"
+                                    data-saldo="{{ empleado[4] }}"
+                                    data-puesto="{{empleado[6]}}"
+                                >
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <div id="modal">
+                    <div class="modal-content">
 
-            <button style="margin-left: 550px;
-            display: block;
-            margin: 20px auto 0;
-            padding: 10px 20px;
-            border: '1';
-            cursor: pointer;" onclick="window.location.href='/insertar';">
+                    <h3>Actualizar Empleado</h3>
+
+                            <p>Datos actuales del empleado:</p>
+                            <p id="info"></p>
+                            <input type="text" name="nombre" placeholder="Nombre" required>
+                            <input type="text" name="documento" placeholder="Documento" required>
+
+                            <select name="puesto" required>
+                                <option value="">Seleccione puesto</option>
+                                {% for puesto in puestos %}
+                                    <option value="{{puesto[0]}}">{{puesto[1]}}</option>
+                                {% endfor %}
+                            </select>
+
+                            <button type="submit" class="btn btn-guardar" onclick="enviarid('/actualizar')">Confirmar</button>
+                            <button type="button" class="btn btn-cancelar" onclick="closeModal()">Cancelar</button>
+                    </div>
+                </div>
+            </form>
+            <button class="btn-insertar" onclick="window.location.href='/insertar';">
                 Insertar
             </button>
+            <div style="margin:20px 0;">
+                <p style="color:rgb(0, 0, 0)">{{mensaje}}</p>
+            </div>
         </div>
         <button id="btnConsultar" disabled style="margin-left: 535px;
             display: block;
             margin: 20px auto 0;
             padding: 10px 20px;
             border: '1';
-            cursor: pointer;" onclick="window.location.href='/consultar';">
+            cursor: pointer;" onclick="openModalC()">
                 Consultar
         </button>
-        <button id="btnEliminar" disabled style="margin-left: 535px;
+        <button onclick ="openModalB()" id="btnEliminar" disabled style="margin-left: 535px;
             display: block;
             margin: 20px auto 0;
             padding: 10px 20px;
             border: '1';
-            cursor: pointer;" onclick="window.location.href='/eliminar';">
+            cursor: pointer;">
                 Eliminar
         </button>
-        <button id="btnActualizar" disabled style="margin-left: 535px;
+        <button onclick = "openModal()" id="btnActualizar" disabled style="margin-left: 535px;
             display: block;
             margin: 20px auto 0;
             padding: 10px 20px;
             border: '1';
-            cursor: pointer;" onclick="window.location.href='/actualizar';">
+            cursor: pointer;">
                 Actualizar
         </button>
         <button id="btnListarM" disabled style="margin-left: 535px;
@@ -88,9 +274,38 @@
             margin: 20px auto 0;
             padding: 10px 20px;
             border: '1';
-            cursor: pointer;" onclick="window.location.href='/listarM';">
+            cursor: pointer;" onclick="enviarid('/movimientos')">
                 Listar Movimientos
         </button>
+        <div id="alertaBorrar">
+            <div class="modal-content">
+
+                <h3>Confirmar Eliminación</h3>
+                <p id="infoEmpleado"></p>
+                <p>¿Está seguro de que desea eliminar este empleado?</p>
+
+                <button type="button" class="btn btn-eliminar" onclick="enviarid('/eliminar')">
+                    Eliminar
+                </button>
+
+                <button type="button" class="btn btn-cancelar" onclick="closeModalB()">
+                    Cancelar
+                </button>
+
+            </div>
+        </div>
+        <div id="modalConsulta">
+            <div class="modal-content">
+
+                <h3>Datos del empleado</h3>
+                <p id="infoEmpleadoC"></p>
+
+                <button type="button" class="btn btn-cancelar" onclick="closeModalC()">
+                   Cerrar
+                </button>
+
+            </div>
+        </div>
         <script>
             const radios = document.querySelectorAll("input[name='empleado']");
             const botones = [
@@ -99,6 +314,7 @@
                 document.getElementById("btnActualizar"),
                 document.getElementById("btnListarM")
             ];
+            botones.forEach(btn => btn.disabled = true);
             radios.forEach(radio => {
             radio.addEventListener("change", () => {
                 botones.forEach(btn => btn.disabled = false);
@@ -111,6 +327,92 @@
             // Enviar el id en la URL
             window.location.href = ruta + "?id=" + id;
             }
+            function openModal() {
+                const seleccionado = document.querySelector("input[name='empleado']:checked");
+                if (!seleccionado) {
+                    alert("Seleccione un empleado");
+                    return;
+                }
+
+                // Obtener datos
+                const nombre = seleccionado.dataset.nombre;
+                const documento = seleccionado.dataset.documento;
+
+                // Insertar en el modal
+                document.getElementById("info").innerHTML = `
+                    <strong>Nombre:</strong> ${nombre} <br>
+                    <strong>Documento:</strong> ${documento} <br>
+                `;
+
+                // Mostrar modal
+                document.getElementById("modal").style.display = "flex";
+            }
+            function closeModal() {
+                document.getElementById("modal").style.display = "none";
+            }
+            function openModalB() {
+                const seleccionado = document.querySelector("input[name='empleado']:checked");
+                if (!seleccionado) {
+                    alert("Seleccione un empleado");
+                    return;
+                }
+
+                // Obtener datos
+                const nombre = seleccionado.dataset.nombre;
+                const documento = seleccionado.dataset.documento;
+                const saldo = seleccionado.dataset.saldo;
+
+                // Insertar en el modal
+                document.getElementById("infoEmpleado").innerHTML = `
+                    <strong>Documento:</strong> ${documento} <br>
+                    <strong>Nombre:</strong> ${nombre} <br>
+                    <strong>Saldo:</strong> ${saldo}
+                `;
+
+                // Mostrar modal
+                document.getElementById("alertaBorrar").style.display = "flex";
+            }
+            function closeModalB() {
+                document.getElementById("alertaBorrar").style.display = "none";
+            }
+            function openModalC() {
+                const seleccionado = document.querySelector("input[name='empleado']:checked");
+                if (!seleccionado) {
+                    alert("Seleccione un empleado");
+                    return;
+                }
+
+                // Obtener datos
+                const nombre = seleccionado.dataset.nombre;
+                const documento = seleccionado.dataset.documento;
+                const saldo = seleccionado.dataset.saldo;
+                const puesto = seleccionado.dataset.puesto;
+
+                // Insertar en el modal
+                document.getElementById("infoEmpleadoC").innerHTML = `
+                    <strong>Documento:</strong> ${documento} <br>
+                    <strong>Nombre:</strong> ${nombre} <br>
+                    <strong>Saldo:</strong> ${saldo}<br>
+                    <strong>Puesto:</strong> ${puesto}
+                `;
+
+                // Mostrar modal
+                document.getElementById("modalConsulta").style.display = "flex";
+            }
+            function closeModalC() {
+                document.getElementById("modalConsulta").style.display = "none";
+            }
+            function enviarid(ruta) {
+            const seleccionado = document.querySelector("input[name='empleado']:checked");
+            if (!seleccionado) {
+                alert("Seleccione un empleado");
+                return;
+            }
+
+            const form = document.getElementById("formAcciones");
+            form.action = ruta;
+            form.submit();
+        }
         </script>
     </body>
 </html>

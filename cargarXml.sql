@@ -134,33 +134,39 @@ set @xml = '
 </Datos>
 '
 
-INSERT INTO Puesto (Nombre,SalarioxHora)
+INSERT INTO dbo.Error (Codigo,Descripcion)
+SELECT
+	e.value('@Codigo','INT'),
+	e.value('@Descripcion','VARCHAR(70)')
+From @xml.nodes('/Datos/Error/error') AS T(e)
+
+INSERT INTO dbo.Puesto (Nombre,SalarioxHora)
 SELECT
 	p.value('@Nombre','VARCHAR(50)'),
 	p.value('@SalarioxHora','MONEY')
 From @xml.nodes('/Datos/Puestos/Puesto') AS T(p)
 
-INSERT INTO TipoEvento(Id,Nombre)
+INSERT INTO dbo.TipoEvento(Id,Nombre)
 SELECT
 	t.value('@Id','Int'),
 	t.value('@Nombre','VARCHAR(100)')
 From @xml.nodes('/Datos/TiposEvento/TipoEvento') AS T(t)
 
-INSERT INTO TipoMovimiento (Id, Nombre, TipoAccion)
+INSERT INTO dbo.TipoMovimiento (Id, Nombre, TipoAccion)
 SELECT 
     t.value('@Id', 'INT'),
     t.value('@Nombre', 'VARCHAR(100)'),
     t.value('@TipoAccion', 'VARCHAR(10)')
 FROM @xml.nodes('/Datos/TiposMovimientos/TipoMovimiento') AS T(t)
 
-INSERT INTO Usuario (Id, Username, Password)
+INSERT INTO dbo.Usuario (Id, Username, Password)
 SELECT 
     u.value('@Id', 'INT'),
     u.value('@Nombre', 'VARCHAR(50)'),
     u.value('@Pass', 'VARCHAR(50)')
 FROM @xml.nodes('/Datos/Usuarios/usuario') AS T(u)
 
-INSERT INTO Empleado (
+INSERT INTO dbo.Empleado (
     IdPuesto,
     ValorDocumentoIdentidad,
     Nombre,
@@ -179,7 +185,7 @@ FROM @xml.nodes('/Datos/Empleados/empleado') AS T(e)
 INNER JOIN Puesto p
     ON p.Nombre = e.value('@Puesto', 'VARCHAR(50)')
 
-INSERT INTO Movimiento (
+INSERT INTO dbo.Movimiento (
     IdEmpleado,
     IdTipoMovimiento,
     Fecha,

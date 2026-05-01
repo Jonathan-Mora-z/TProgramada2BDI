@@ -1,6 +1,8 @@
-from flask import Flask, redirect, render_template, request
+from flask import Flask, redirect, render_template, request, session
 import pyodbc
 app = Flask(__name__)
+app.secret_key = "S"
+numeroIntentos=0
 #---------Conexion a la base de datos---------
 def conectarBD():
     return pyodbc.connect(
@@ -23,21 +25,49 @@ def procesarLogin():
     cursor=BD.cursor()
     cursor.execute("EXEC dbo.consultarUsuario @Username=?, @Password=?", (usuario, contraseña))
     resultado = cursor.fetchone()
-    if resultado is None:
-        BD.close()
-        return "Error: no se recibió resultado"
     result = resultado[0]
-    if result==50001:
+    global numeroIntentos
+    if result==50001 or result==50002:
+        numeroIntentos+=1
+        cursor.execute("EXEC dbo.obtenerError @Codigo=?", (result,))
+        error = cursor.fetchone()[0]
+        cursor.execute("EXEC dbo.registrarEnBitacora @IdTipoEvento=?, @Descripcion=?, @idUsuario=?, @PostInIp=?",
+                       (2, f"{error},Numero de intentos: {numeroIntentos},Codigo de error: {result}", None, request.remote_addr))
+        BD.commit()
         BD.close()
-        mensaje = "Error: Usuario no existe."
-        return render_template("loginTarea.html", mensaje=mensaje)
-    if result==50002:
+        if result==50001:
+            mensaje = error
+            return render_template("loginTarea.html", mensaje=mensaje)
+        else:
+            mensaje = error
+            return render_template("loginTarea.html", mensaje=mensaje)
+    elif result==50003:
+        cursor.execute("EXEC dbo.registrarEnBitacora @IdTipoEvento=?, @Descripcion=?, @idUsuario=?, @PostInIp=?",
+                       (3, "Login Deshabilitado", None, request.remote_addr))
+        BD.commit()
         BD.close()
-        mensaje = "Error: Contraseña incorrecta."
+        mensaje = "Limite de intentos alcanzado. Espere 2 minutos para volver a intentar."
         return render_template("loginTarea.html", mensaje=mensaje)
-    BD.commit()
-    BD.close()
-    return redirect("/principal")
+    else:
+        IdUsuario = resultado[1]
+        session["IdUsuario"] = IdUsuario
+        cursor.execute("EXEC dbo.registrarEnBitacora @IdTipoEvento=?, @Descripcion=?, @idUsuario=?, @PostInIp=?",
+                       (1, f"Login Exitoso", IdUsuario, request.remote_addr))
+        BD.commit()
+        BD.close()
+        return redirect("/principal")
+@app.route("/logout")
+def logout():
+    IdUsuario = session.get("IdUsuario")
+    if IdUsuario:
+        BD = conectarBD()
+        cursor = BD.cursor()
+        cursor.execute("EXEC dbo.registrarEnBitacora @IdTipoEvento=?, @Descripcion=?, @idUsuario=?, @PostInIp=?",
+                       (4, "Logout", IdUsuario, request.remote_addr))
+        BD.commit()
+        BD.close()
+    session.clear()
+    return redirect("/")
 # ----------Página principal HTML/Flask-------
 @app.route("/principal")
 def inicio():
@@ -49,7 +79,19 @@ def inicio():
     puestos = cursor.fetchall()
     BD.close()
     return render_template("browserTareaBD.html",empleados=empleados,puestos=puestos)
-
+@app.route("/filtrar", methods=["GET","POST"])
+def filtrar():
+    filtro = request.form["filtro"]
+    BD=conectarBD()
+    cursor=BD.cursor()
+    if not filtro or filtro.strip() == "":
+        return redirect("/principal")
+    cursor.execute("EXEC dbo.filtrarEmpleados @Filtro=?", (filtro,))
+    empleados = cursor.fetchall()
+    cursor.execute("EXEC dbo.consultarPuestos")
+    puestos = cursor.fetchall()
+    BD.close()
+    return render_template("browserTareaBD.html",empleados=empleados,puestos=puestos)
 # Página del formulario
 @app.route("/insertar")
 def insertar():
@@ -139,8 +181,8 @@ def insertar_movimiento(id):
     BD = conectarBD()
     cursor = BD.cursor()
 
-    # Obtener tipos de movimiento (para dropdown)
-    cursor.execute("SELECT Id, Nombre FROM TipoMovimiento")
+
+    cursor.execute("EXEC dbo.consultarTiposMovimiento")
     tipos = cursor.fetchall()
 
     BD.close()
@@ -155,12 +197,12 @@ def guardar_movimiento():
     IdTipoMovimiento = request.form["IdTipoMovimiento"]
     Monto = request.form["Monto"]
 
-    # ⚠️ por ahora valores fijos (luego login)
-    IdUsuario = 1
-    IP = 123456  # si usas INT
 
     BD = conectarBD()
     cursor = BD.cursor()
+
+    IdUsuario = session["IdUsuario"]
+    IP = request.remote_addr
 
     cursor.execute(
         "EXEC insertarMovimiento ?, ?, ?, ?, ?",

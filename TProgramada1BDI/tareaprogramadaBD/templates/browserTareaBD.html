@@ -70,16 +70,28 @@
                 background-color: #ccc;
                 cursor: not-allowed;
             }
+            .botones-acciones {
+                display: flex;
+                justify-content: center; /* centrados */
+                gap: 10px; /* espacio entre botones */
+                margin-top: 20px;
+            }
 
+            .botones-acciones button {
+                display: inline-block; /* ya no block */
+                margin: 0; /* quitamos el margin auto */
+            }
             #btnConsultar { background-color: #17a2b8; color: white; }
             #btnEliminar { background-color: #dc3545; color: white; }
             #btnActualizar { background-color: #ffc107; color: black; }
             #btnListarM { background-color: #28a745; color: white; }
+            #btnSalir { background-color: #59495f; color: white; }
 
-            #btnConsultar:hover { background-color: #138496; }
-            #btnEliminar:hover { background-color: #c82333; }
-            #btnActualizar:hover { background-color: #e0a800; }
-            #btnListarM:hover { background-color: #218838; }
+            #btnConsultar:hover { background-color: #084c57; }
+            #btnEliminar:hover { background-color: #590c14; }
+            #btnActualizar:hover { background-color: #604c12; }
+            #btnListarM:hover { background-color: #0c4c1a; }
+            #btnSalir:hover { background-color: #2f2930; }
 
             /* Insertar */
             .btn-insertar {
@@ -88,7 +100,7 @@
             }
 
             .btn-insertar:hover {
-                background-color: #0069d9;
+                background-color: #024082;
             }
 
             /* Modal fondo */
@@ -170,6 +182,11 @@
         </h1>
 
         <div class="contenedor">
+            <form method="POST" action="/filtrar" style="margin-bottom:15px;">
+                    <h3 style="display:inline;">Filtrar:</h3>
+                    <input type="text" name="filtro" placeholder="Ingrese nombre o documento">
+                    <button type="submit">Buscar</button>
+            </form>
             <form method="POST" id="formAcciones">
                 <table border="1" width="100%">
                     <tr align="left">
@@ -233,45 +250,22 @@
                     </div>
                 </div>
             </form>
-            <button class="btn-insertar" onclick="window.location.href='/insertar';">
-                Insertar
-            </button>
+            <div class="botones-acciones">
+                <button class="btn-insertar" onclick="window.location.href='/insertar';">
+                    Insertar
+                </button>
+                <button id="btnConsultar" disabled onclick="openModalC()">Consultar</button>
+                <button id="btnEliminar" disabled onclick="openModalB()">Eliminar</button>
+                <button id="btnActualizar" disabled onclick="openModal()">Actualizar</button>
+                <button id="btnListarM" disabled onclick="enviarid('/movimientos')">Listar Movimientos</button>
+                <button id="btnSalir" onclick="window.location.href='/logout';">
+                    Salir
+                </button>
+            </div>
             <div style="margin:20px 0;">
                 <p style="color:rgb(0, 0, 0)">{{mensaje}}</p>
             </div>
         </div>
-        <button id="btnConsultar" disabled style="margin-left: 535px;
-            display: block;
-            margin: 20px auto 0;
-            padding: 10px 20px;
-            border: '1';
-            cursor: pointer;" onclick="openModalC()">
-                Consultar
-        </button>
-        <button onclick ="openModalB()" id="btnEliminar" disabled style="margin-left: 535px;
-            display: block;
-            margin: 20px auto 0;
-            padding: 10px 20px;
-            border: '1';
-            cursor: pointer;">
-                Eliminar
-        </button>
-        <button onclick = "openModal()" id="btnActualizar" disabled style="margin-left: 535px;
-            display: block;
-            margin: 20px auto 0;
-            padding: 10px 20px;
-            border: '1';
-            cursor: pointer;">
-                Actualizar
-        </button>
-        <button id="btnListarM" disabled style="margin-left: 535px;
-            display: block;
-            margin: 20px auto 0;
-            padding: 10px 20px;
-            border: '1';
-            cursor: pointer;" onclick="enviarid('/movimientos')">
-                Listar Movimientos
-        </button>
         <div id="alertaBorrar">
             <div class="modal-content">
 

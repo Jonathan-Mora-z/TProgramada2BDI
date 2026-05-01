@@ -1,6 +1,7 @@
-from flask import Flask, redirect, render_template, request
+from flask import Flask, redirect, render_template, request, session
 import pyodbc
 app = Flask(__name__)
+app.secret_key = "S"
 #---------Conexion a la base de datos---------
 def conectarBD():
     return pyodbc.connect(
@@ -35,6 +36,9 @@ def procesarLogin():
         BD.close()
         mensaje = "Error: Contraseña incorrecta."
         return render_template("loginTarea.html", mensaje=mensaje)
+
+    IdUsuario = resultado[1]
+    session["IdUsuario"] = IdUsuario
     BD.commit()
     BD.close()
     return redirect("/principal")
@@ -151,8 +155,8 @@ def insertar_movimiento(id):
     BD = conectarBD()
     cursor = BD.cursor()
 
-    # Obtener tipos de movimiento (para dropdown)
-    cursor.execute("SELECT Id, Nombre FROM TipoMovimiento")
+
+    cursor.execute("EXEC dbo.consultarTiposMovimiento")
     tipos = cursor.fetchall()
 
     BD.close()
@@ -167,12 +171,12 @@ def guardar_movimiento():
     IdTipoMovimiento = request.form["IdTipoMovimiento"]
     Monto = request.form["Monto"]
 
-    # ⚠️ por ahora valores fijos (luego login)
-    IdUsuario = 1
-    IP = 123456  # si usas INT
 
     BD = conectarBD()
     cursor = BD.cursor()
+
+    IdUsuario = session["IdUsuario"]
+    IP = request.remote_addr
 
     cursor.execute(
         "EXEC insertarMovimiento ?, ?, ?, ?, ?",

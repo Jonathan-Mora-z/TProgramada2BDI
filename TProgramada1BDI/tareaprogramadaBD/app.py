@@ -129,28 +129,35 @@ def procesar():
     nombre = request.form["nombre"]
     docIden = request.form["docIden"]
     puesto = request.form["puesto"]
-    if not nombre.replace(" ", "").isalpha():
-        mensaje = "Error: El nombre debe contener solo letras."
-        return render_template("formulario.html", mensaje=mensaje)
-    if not docIden.isdigit():
-        mensaje = "Error: El documento de identidad debe ser un número."
-        return render_template("formulario.html", mensaje=mensaje)
-    else:
-        BD=conectarBD()
-        cursor=BD.cursor()
-        cursor.execute("""DECLARE @ret INT;EXEC @ret = dbo.InsertarEmpleado @IdPuesto=?,@ValorDocumentoIdentidad=?,@Nombre=?;SELECT @ret;""", (puesto,docIden,nombre))
-        resultado = cursor.fetchone()
-        if resultado is None:
-            BD.close()
-            return "Error: no se recibió resultado"
-        result = resultado[0]
-        if result==-1:
-            BD.close()
-            mensaje = "Error: El empleado ya existe."
-            return render_template("formulario.html", mensaje=mensaje)
+    BD = conectarBD()
+    cursor = BD.cursor()
+    cursor.execute(
+        "EXEC dbo.insertarEmpleado @IdPuesto=?, @ValorDocumentoIdentidad=?, @Nombre=?",
+        (puesto, docIden, nombre)
+    )
+    resultado = cursor.fetchone()
+    if resultado is None:
+        BD.close()
+        return "Error: no se recibió resultado"
+    codigo = resultado[0]
+    if codigo != 0:
+        cursor.execute("EXEC dbo.obtenerError @Codigo=?", (codigo,))
+        error = cursor.fetchone()[0]
+        cursor.execute(
+            "EXEC dbo.registrarEnBitacora @IdTipoEvento=?, @Descripcion=?, @idUsuario=?, @PostInIp=?",
+            (5, f"{error} Codigo de error: {codigo}", session.get("IdUsuario"), request.remote_addr)
+        )
         BD.commit()
         BD.close()
-        return redirect("/principal")
+        return render_template("formulario.html", mensaje=error)
+    cursor.execute(
+        "EXEC dbo.registrarEnBitacora @IdTipoEvento=?, @Descripcion=?, @idUsuario=?, @PostInIp=?",
+        (6, "Inserción exitosa", session.get("IdUsuario"), request.remote_addr)
+    )
+
+    BD.commit()
+    BD.close()
+    return redirect("/principal")
 @app.route("/movimientos",methods =["GET","POST"])
 def movimientos():
     if request.method == "POST":

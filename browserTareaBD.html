@@ -70,16 +70,28 @@
                 background-color: #ccc;
                 cursor: not-allowed;
             }
+            .botones-acciones {
+                display: flex;
+                justify-content: center; /* centrados */
+                gap: 10px; /* espacio entre botones */
+                margin-top: 20px;
+            }
 
+            .botones-acciones button {
+                display: inline-block; /* ya no block */
+                margin: 0; /* quitamos el margin auto */
+            }
             #btnConsultar { background-color: #17a2b8; color: white; }
             #btnEliminar { background-color: #dc3545; color: white; }
             #btnActualizar { background-color: #ffc107; color: black; }
             #btnListarM { background-color: #28a745; color: white; }
+            #btnSalir { background-color: #59495f; color: white; }
 
-            #btnConsultar:hover { background-color: #138496; }
-            #btnEliminar:hover { background-color: #c82333; }
-            #btnActualizar:hover { background-color: #e0a800; }
-            #btnListarM:hover { background-color: #218838; }
+            #btnConsultar:hover { background-color: #084c57; }
+            #btnEliminar:hover { background-color: #590c14; }
+            #btnActualizar:hover { background-color: #604c12; }
+            #btnListarM:hover { background-color: #0c4c1a; }
+            #btnSalir:hover { background-color: #2f2930; }
 
             /* Insertar */
             .btn-insertar {
@@ -88,7 +100,7 @@
             }
 
             .btn-insertar:hover {
-                background-color: #0069d9;
+                background-color: #024082;
             }
 
             /* Modal fondo */
@@ -170,6 +182,9 @@
         </h1>
 
         <div class="contenedor">
+            <div style="margin:20px 0;">
+                <p style="color:rgb(0, 0, 0)">{{mensaje}}</p>
+            </div>
             <form method="POST" action="/filtrar" style="margin-bottom:15px;">
                     <h3 style="display:inline;">Filtrar:</h3>
                     <input type="text" name="filtro" placeholder="Ingrese nombre o documento">
@@ -216,94 +231,65 @@
                     </tr>
                     {% endfor %}
                 </table>
-                <div id="modal">
-                    <div class="modal-content">
-
-                    <h3>Actualizar Empleado</h3>
-
-                            <p>Datos actuales del empleado:</p>
-                            <p id="info"></p>
-                            <input type="text" name="nombre" placeholder="Nombre" required>
-                            <input type="text" name="documento" placeholder="Documento" required>
-
-                            <select name="puesto" required>
-                                <option value="">Seleccione puesto</option>
-                                {% for puesto in puestos %}
-                                    <option value="{{puesto[0]}}">{{puesto[1]}}</option>
-                                {% endfor %}
-                            </select>
-
-                            <button type="submit" class="btn btn-guardar" onclick="enviarid('/actualizar')">Confirmar</button>
-                            <button type="button" class="btn btn-cancelar" onclick="closeModal()">Cancelar</button>
-                    </div>
-                </div>
+                <div class="botones-acciones">
+                <button type="button"class="btn-insertar" onclick="window.location.href='/insertar';">
+                    Insertar
+                </button>
+                <button type="button" id="btnConsultar" disabled onclick="openModalC()">Consultar</button>
+                <button type="button" id="btnEliminar" disabled onclick="openModalB()">Eliminar</button>
+                <button type="button" id="btnActualizar" disabled onclick="openModal()">Actualizar</button>
+                <button type="submit" id="btnListarM" disabled formaction="/movimientos">Listar Movimientos</button>
+                <button type="button" id="btnSalir" onclick="window.location.href='/logout';">
+                    Salir
+                </button>
+            </div>
             </form>
-            <button class="btn-insertar" onclick="window.location.href='/insertar';">
-                Insertar
-            </button>
-            <div style="margin:20px 0;">
-                <p style="color:rgb(0, 0, 0)">{{mensaje}}</p>
+            <div id="modal">
+                <div class="modal-content">
+                <h3>Actualizar Empleado</h3>
+                        <p>Datos actuales del empleado:</p>
+                        <p id="info"></p>
+                        <input form="formAcciones" type="text" name="nombre" placeholder="Nombre" >
+                        <input form="formAcciones" type="text" name="documento" placeholder="Documento" >
+
+                        <select form="formAcciones" name="puesto" >
+                            <option value="">Seleccione puesto</option>
+                            {% for puesto in puestos %}
+                                <option value="{{puesto[0]}}">{{puesto[1]}}</option>
+                            {% endfor %}
+                        </select>
+                        <button form= "formAcciones" type="submit" class="btn btn-guardar" formaction="/actualizar">Confirmar</button>
+                        <button type="button" class="btn btn-cancelar" onclick="closeModal()">Cancelar</button>
+                </div>
             </div>
-        </div>
-        <button id="btnConsultar" disabled style="margin-left: 535px;
-            display: block;
-            margin: 20px auto 0;
-            padding: 10px 20px;
-            border: '1';
-            cursor: pointer;" onclick="openModalC()">
-                Consultar
-        </button>
-        <button onclick ="openModalB()" id="btnEliminar" disabled style="margin-left: 535px;
-            display: block;
-            margin: 20px auto 0;
-            padding: 10px 20px;
-            border: '1';
-            cursor: pointer;">
-                Eliminar
-        </button>
-        <button onclick = "openModal()" id="btnActualizar" disabled style="margin-left: 535px;
-            display: block;
-            margin: 20px auto 0;
-            padding: 10px 20px;
-            border: '1';
-            cursor: pointer;">
-                Actualizar
-        </button>
-        <button id="btnListarM" disabled style="margin-left: 535px;
-            display: block;
-            margin: 20px auto 0;
-            padding: 10px 20px;
-            border: '1';
-            cursor: pointer;" onclick="enviarid('/movimientos')">
-                Listar Movimientos
-        </button>
-        <div id="alertaBorrar">
-            <div class="modal-content">
+            <div id="alertaBorrar">
+                <div class="modal-content">
 
-                <h3>Confirmar Eliminación</h3>
-                <p id="infoEmpleado"></p>
-                <p>¿Está seguro de que desea eliminar este empleado?</p>
+                    <h3>Confirmar Eliminación</h3>
+                    <p id="infoEmpleado"></p>
+                    <p>¿Está seguro de que desea eliminar este empleado?</p>
 
-                <button type="button" class="btn btn-eliminar" onclick="enviarid('/eliminar')">
-                    Eliminar
-                </button>
+                    <button name="accion" value="10" form= "formAcciones" type="submit" class="btn btn-eliminar" formaction="/eliminar">
+                        Eliminar
+                    </button>
 
-                <button type="button" class="btn btn-cancelar" onclick="closeModalB()">
-                    Cancelar
-                </button>
+                    <button form = "formAcciones" name="accion" value="9" type="submit" class="btn btn-cancelar" formaction="/eliminar">
+                        Cancelar
+                    </button>
 
+                </div>
             </div>
-        </div>
-        <div id="modalConsulta">
-            <div class="modal-content">
+            <div id="modalConsulta">
+                <div class="modal-content">
 
-                <h3>Datos del empleado</h3>
-                <p id="infoEmpleadoC"></p>
+                    <h3>Datos del empleado</h3>
+                    <p id="infoEmpleadoC"></p>
 
-                <button type="button" class="btn btn-cancelar" onclick="closeModalC()">
-                   Cerrar
-                </button>
+                    <button type="button" class="btn btn-cancelar" onclick="closeModalC()">
+                    Cerrar
+                    </button>
 
+                </div>
             </div>
         </div>
         <script>
@@ -314,25 +300,15 @@
                 document.getElementById("btnActualizar"),
                 document.getElementById("btnListarM")
             ];
-            botones.forEach(btn => btn.disabled = true);
             radios.forEach(radio => {
             radio.addEventListener("change", () => {
                 botones.forEach(btn => btn.disabled = false);
                 });
             });
-            function redirigir(ruta) {
-            const seleccionado = document.querySelector("input[name='empleado']:checked");
-            if (!seleccionado) return;
-            const id = seleccionado.value;
-            // Enviar el id en la URL
-            window.location.href = ruta + "?id=" + id;
-            }
+
             function openModal() {
-                const seleccionado = document.querySelector("input[name='empleado']:checked");
-                if (!seleccionado) {
-                    alert("Seleccione un empleado");
-                    return;
-                }
+                const seleccionado = getSeleccionado();
+                if (!seleccionado) return;
 
                 // Obtener datos
                 const nombre = seleccionado.dataset.nombre;
@@ -351,11 +327,8 @@
                 document.getElementById("modal").style.display = "none";
             }
             function openModalB() {
-                const seleccionado = document.querySelector("input[name='empleado']:checked");
-                if (!seleccionado) {
-                    alert("Seleccione un empleado");
-                    return;
-                }
+                const seleccionado = getSeleccionado();
+                if (!seleccionado) return;
 
                 // Obtener datos
                 const nombre = seleccionado.dataset.nombre;
@@ -376,11 +349,8 @@
                 document.getElementById("alertaBorrar").style.display = "none";
             }
             function openModalC() {
-                const seleccionado = document.querySelector("input[name='empleado']:checked");
-                if (!seleccionado) {
-                    alert("Seleccione un empleado");
-                    return;
-                }
+                const seleccionado = getSeleccionado();
+                if (!seleccionado) return;
 
                 // Obtener datos
                 const nombre = seleccionado.dataset.nombre;
@@ -402,17 +372,14 @@
             function closeModalC() {
                 document.getElementById("modalConsulta").style.display = "none";
             }
-            function enviarid(ruta) {
-            const seleccionado = document.querySelector("input[name='empleado']:checked");
-            if (!seleccionado) {
-                alert("Seleccione un empleado");
-                return;
+            function getSeleccionado() {
+                const seleccionado = document.querySelector("input[name='empleado']:checked");
+                if (!seleccionado) {
+                    alert("Seleccione un empleado");
+                    return null;
+                }
+                return seleccionado;
             }
-
-            const form = document.getElementById("formAcciones");
-            form.action = ruta;
-            form.submit();
-        }
         </script>
     </body>
 </html>

@@ -15,14 +15,28 @@ def conectarBD():
 #-------------Pagina de login----------------
 @app.route("/", methods=["GET","POST"])
 def Login():
-    return render_template("loginTarea.html")
+    return render_template("loginTarea.html", deshabilitado=False)
 
 @app.route("/login", methods=["POST"])
 def procesarLogin():
     usuario = request.form["Username"]
     contraseña = request.form["Password"]
+    ip = request.remote_addr
     BD=conectarBD()
     cursor=BD.cursor()
+    cursor.execute("EXEC dbo.verificarBloqueoLogin ?, ?", (usuario, ip))
+    bloqueado = cursor.fetchone()[0]
+    if bloqueado == 1:
+        cursor.execute("EXEC dbo.registrarEnBitacora ?, ?, ?, ?",(3, "Login deshabilitado por intentos", None, ip))
+        BD.commit()
+        BD.close()
+
+        return render_template(
+            "loginTarea.html",
+            mensaje="Demasiados intentos. Intente en 10 minutos.",
+            deshabilitado=True
+        )
+
     cursor.execute("EXEC dbo.consultarUsuario @Username=?, @Password=?", (usuario, contraseña))
     resultado = cursor.fetchone()
     result = resultado[0]
